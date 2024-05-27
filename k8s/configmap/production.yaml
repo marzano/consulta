@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: consulta-sptrans-status-cartao-configmap
+  namespace: consulta-sptrans
+data:
+  Database__DataSource: '#{DATABASE_DATASOURCE}'
+  Database__InitialCatalog: 'roteirizacao'
+  Database__User: 'AppRoteirizacao'
+
+  Queue__Host: 'rabbit.empresa.net'
+  Queue__VirtualHost: 'operacoes'
+  Queue__Port: '6666'
+  Queue__User: 'user'
+  Queue__Durable: 'true'
+  Queue__TTL: '60000'
+  Queue__Retries: '3'
+  Queue__Publishing__VirtualHost: 'operacoes'
+
+  Serilog__MinimumLevel__Default: 'Error'
+  Serilog__MinimumLevel__Override__Microsoft: 'Error'
+  Serilog__MinimumLevel__Override__System: 'Error'
+  
+  ServiceData__InstrumentationKey: '#{APPLICATION_INSIGHTS_CONNECTION_STRING}'
+  ServiceData__Environment: 'PRD'
+  ServiceData__CurrentAppName: 'SPTrans-StatusCadastro'  

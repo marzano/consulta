@@ -1,0 +1,48 @@
+name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.rr)
+
+trigger:
+  - master
+  - release/*
+  - hotfix/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: DOCKER
+
+steps:
+  - task: replacetokens@3
+    inputs:
+      targetFiles: '**/Dockerfile'
+      encoding: 'auto'
+      writeBOM: true
+      actionOnMissing: 'warn'
+      keepToken: false
+      tokenPrefix: '#{'
+      tokenSuffix: '}'
+      useLegacyPattern: false
+      enableTelemetry: true
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'RegistryA'
+      repository: 'consulta/svc-sptrans-status-cartao'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      tags: '$(Build.BuildId)'
+      buildcontext: ''
+
+  - task: CopyFiles@2
+    displayName: 'Copiando artefatos'
+    inputs:
+      SourceFolder: 'k8s'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publicando artefatos'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'k8s'
+      publishLocation: 'Container'
